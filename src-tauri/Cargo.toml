@@ -1,0 +1,30 @@
+[package]
+name = "ftgen"
+version = "1.0.0"
+description = "FTGen - Générateur de Fiches Techniques LaTeX"
+authors = ["GT IA/Maths - Académie de Reims"]
+edition = "2021"
+
+[lib]
+name = "ftgen_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[[bin]]
+name = "ftgen"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-shell = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+regex = "1"
+base64 = "0.22"
+zip = "2"
+reqwest = { version = "0.12", features = ["json"] }

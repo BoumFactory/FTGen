@@ -1,0 +1,18 @@
+# Dépendances / build
+node_modules/
+dist/
+src-tauri/target/
+
+# Sidecars binaires (volumineux ; le CI macOS télécharge les siens,
+# le binaire Windows reste en local pour les builds Windows)
+src-tauri/binaries/
+
+# Données runtime FTGen : NON incluses dans le dépôt (inutiles au build,
+# contiennent des données perso). Le dossier .ftgen est fourni séparément
+# avec l'application au moment de la distribution.
+.ftgen/
+
+# Divers
+*.log
+.DS_Store
+Thumbs.db

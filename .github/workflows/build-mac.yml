@@ -1,0 +1,71 @@
+name: Build macOS
+
+# Compile FTGen pour macOS (Intel + Apple Silicon) sur un vrai runner macOS.
+# Déclenché à chaque push sur main, ou manuellement (onglet Actions > Run workflow).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.8.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Setup Rust (cibles Intel + Apple Silicon)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - name: Cache Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Installer les dépendances JS
+        run: pnpm install
+
+      - name: Récupérer les sidecars tectonic (macOS)
+        env:
+          TECTONIC_VERSION: 0.16.9
+        run: |
+          set -euo pipefail
+          mkdir -p src-tauri/binaries
+          for ARCH in x86_64 aarch64; do
+            URL="https://github.com/tectonic-typesetting/tectonic/releases/download/tectonic%40${TECTONIC_VERSION}/tectonic-${TECTONIC_VERSION}-${ARCH}-apple-darwin.tar.gz"
+            echo "Téléchargement: $URL"
+            curl -fL "$URL" -o tectonic.tar.gz
+            tar xzf tectonic.tar.gz
+            chmod +x tectonic
+            mv tectonic "src-tauri/binaries/tectonic-${ARCH}-apple-darwin"
+            rm tectonic.tar.gz
+          done
+          ls -la src-tauri/binaries
+
+      - name: Build Tauri (binaire universel)
+        uses: tauri-apps/tauri-action@v0
+        with:
+          args: --target universal-apple-darwin
+
+      - name: Publier les artefacts (.dmg + .app)
+        uses: actions/upload-artifact@v4
+        with:
+          name: FTGen-macOS
+          if-no-files-found: error
+          path: |
+            src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+            src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app

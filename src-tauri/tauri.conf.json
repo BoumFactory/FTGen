@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicedoc/tauri/v2/crates/tauri-utils/schema.json",
+  "productName": "FTGen",
+  "version": "1.0.0",
+  "identifier": "fr.ac-reims.ftgen",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "FTGen - Générateur de Fiches Techniques",
+        "width": 1400,
+        "height": 900,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "externalBin": [
+      "binaries/tectonic"
+    ]
+  },
+  "plugins": {}
+}

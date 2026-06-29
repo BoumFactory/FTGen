@@ -1,0 +1,212 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════
+   PALETTE — Light mode (bleu aérien)
+   ═══════════════════════════════════════════ */
+@layer base {
+  :root {
+    /* Marine — surfaces (light mode)
+       900 = fond app (le plus clair)
+       800 = zones inset (plus sombre que 900)
+       700 = cards (blanc pur)
+       600 = cards élevées (entre blanc et fond) */
+    --marine-50:  225 235 248;
+    --marine-100: 200 215 235;
+    --marine-200: 60 85 118;
+    --marine-300: 80 108 145;
+    --marine-400: 135 158 188;
+    --marine-500: 185 200 222;
+    --marine-600: 242 245 250;
+    --marine-700: 255 255 255;
+    --marine-800: 210 218 232;
+    --marine-900: 230 236 246;
+
+    /* Or → Bleu accent (saturé + foncé pour contraste sur fond clair) */
+    --or-50:  230 242 255;
+    --or-100: 200 222 252;
+    --or-200: 110 170 248;
+    --or-300: 50 130 245;
+    --or-400: 30 105 238;
+    --or-500: 20 80 218;
+    --or-600: 15 62 195;
+    --or-700: 18 50 162;
+    --or-800: 20 42 125;
+    --or-900: 14 28 72;
+
+    /* Crème → texte sombre (très foncé pour max lisibilité) */
+    --creme-50:  255 255 255;
+    --creme-100: 242 245 250;
+    --creme-200: 15 23 42;
+    --creme-300: 30 42 62;
+    --creme-400: 50 62 82;
+
+    /* Muted (nettement plus foncé pour lisibilité sur fond clair) */
+    --muted: 50 65 90;
+    --muted-light: 75 92 118;
+    --muted-dark: 30 42 62;
+    --muted-blue: 55 75 105;
+
+    /* Extras */
+    --btn-text: 255 255 255;
+    --shadow-color: 60 80 115;
+    --app-zoom: 1;
+    font-size: calc(18px * var(--app-zoom));
+  }
+
+  /* ═══════════════════════════════════════════
+     PALETTE — Dark mode (marine & or)
+     Écarts renforcés entre surfaces
+     ═══════════════════════════════════════════ */
+  .dark {
+    /* Marine — surfaces (écarts renforcés) */
+    --marine-50:  232 237 242;
+    --marine-100: 196 209 222;
+    --marine-200: 160 185 210;
+    --marine-300: 75 125 170;
+    --marine-400: 42 90 138;
+    --marine-500: 16 56 98;
+    --marine-600: 4 36 70;
+    --marine-700: 2 28 56;
+    --marine-800: 0 16 34;
+    --marine-900: 0 8 18;
+
+    /* Or — accent doré (plus lumineux pour pop) */
+    --or-50:  252 248 232;
+    --or-100: 248 238 195;
+    --or-200: 242 225 150;
+    --or-300: 232 208 85;
+    --or-400: 220 190 50;
+    --or-500: 210 170 42;
+    --or-600: 175 140 32;
+    --or-700: 140 110 25;
+    --or-800: 105 80 18;
+    --or-900: 68 52 12;
+
+    /* Crème — texte clair (plus blanc pour contraste) */
+    --creme-50:  255 255 255;
+    --creme-100: 255 254 250;
+    --creme-200: 252 250 242;
+    --creme-300: 240 235 218;
+    --creme-400: 225 218 198;
+
+    /* Muted (plus lisible — contraste renforcé) */
+    --muted: 175 188 208;
+    --muted-light: 218 225 235;
+    --muted-dark: 140 155 178;
+    --muted-blue: 195 208 222;
+
+    /* Extras */
+    --btn-text: 0 14 32;
+    --shadow-color: 0 0 0;
+  }
+
+  body {
+    @apply bg-marine-900 text-creme-200 font-sans text-base;
+    overflow: hidden;
+  }
+
+  #root {
+    width: 100vw;
+    height: 100vh;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgb(var(--marine-800));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--marine-400));
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--or-500));
+  }
+}
+
+/* ═══════════════════════════════════════════
+   COMPOSANTS
+   ═══════════════════════════════════════════ */
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-or-500 font-semibold rounded-md min-h-[44px]
+           hover:bg-or-400 transition-colors duration-150
+           focus:outline-none focus:ring-2 focus:ring-or-300;
+    color: rgb(var(--btn-text));
+    box-shadow: 0 2px 6px rgb(var(--shadow-color) / 0.18);
+  }
+
+  .btn-secondary {
+    @apply px-5 py-2.5 bg-marine-500 text-creme-300 rounded-md min-h-[44px]
+           hover:bg-marine-400 transition-colors duration-150
+           border-2 border-marine-300/45
+           focus:outline-none focus:ring-2 focus:ring-marine-300/40;
+  }
+
+  .card {
+    @apply bg-marine-700 border-2 border-marine-300/30 rounded-lg p-4;
+    box-shadow: 0 4px 8px -1px rgb(var(--shadow-color) / 0.12),
+                0 2px 4px -2px rgb(var(--shadow-color) / 0.06);
+  }
+
+  .card-elevated {
+    @apply bg-marine-600 border-2 border-or-500/30 rounded-lg p-4;
+    box-shadow: 0 10px 18px -3px rgb(var(--shadow-color) / 0.18),
+                0 4px 8px -4px rgb(var(--shadow-color) / 0.12);
+  }
+
+  .card-inset {
+    @apply bg-marine-800 border-2 border-marine-400/30 rounded-md p-4
+           shadow-inner;
+  }
+
+  .section-title {
+    @apply text-[1.05rem] font-bold text-or-400 uppercase tracking-wider
+           flex items-center gap-2.5 border-l-[3px] border-or-500 pl-3 py-1.5;
+  }
+
+  .chip {
+    @apply px-4 py-2 rounded-md transition-all cursor-pointer;
+  }
+
+  .chip-active {
+    @apply bg-or-500/25 text-or-300 border-2 border-or-500/60 shadow-sm shadow-or-500/15 font-medium;
+  }
+
+  .chip-inactive {
+    @apply bg-marine-700 text-muted-light border-2 border-marine-300/40
+           hover:border-or-500/40 hover:text-creme-200;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-marine-800 border-2 border-marine-300/40
+           rounded-md text-creme-200 placeholder:text-muted min-h-[48px]
+           focus:outline-none focus:border-or-500 focus:ring-1 focus:ring-or-500/50;
+  }
+}
+
+/* Texte contrasté sur fond accent (blanc en light, sombre en dark) */
+.text-on-accent {
+  color: rgb(var(--btn-text));
+}
+
+/* Toast animation */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 0.25s ease-out;
+}
