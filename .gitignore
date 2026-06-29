@@ -16,3 +16,8 @@ src-tauri/binaries/
 *.log
 .DS_Store
 Thumbs.db
+
+# Icônes mobiles générées par "tauri icon" (inutiles au build desktop)
+src-tauri/icons/android/
+src-tauri/icons/ios/
+src-tauri/gen/
