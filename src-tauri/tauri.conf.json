@@ -24,6 +24,8 @@
     }
   },
   "bundle": {
+    "active": true,
+    "targets": "all",
     "externalBin": [
       "binaries/tectonic"
     ]
