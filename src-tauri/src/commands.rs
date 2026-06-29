@@ -250,6 +250,19 @@ pub struct ExportResult {
 // Helpers
 // ═══════════════════════════════════════════════════════════════
 
+/// Vrai si le dossier `.ftgen` donné contient au moins un template (.tex).
+fn ftgen_has_templates(ftgen_dir: &std::path::Path) -> bool {
+    let tdir = ftgen_dir.join("templates");
+    if let Ok(entries) = fs::read_dir(&tdir) {
+        for e in entries.flatten() {
+            if e.path().extension().and_then(|s| s.to_str()) == Some("tex") {
+                return true;
+            }
+        }
+    }
+    false
+}
+
 fn get_ftgen_dir(app: &tauri::AppHandle) -> PathBuf {
     let config_path = get_config_path(app);
     if config_path.exists() {
@@ -270,6 +283,16 @@ fn get_ftgen_dir(app: &tauri::AppHandle) -> PathBuf {
     //   - macOS   : .ftgen à côté de FTGen.app (exe = .../FTGen.app/Contents/MacOS/FTGen)
     //   - dev     : .ftgen à la racine du projet (au-dessus de src-tauri/target/…)
     if let Ok(exe) = std::env::current_exe() {
+        // 1er passage : privilégier un .ftgen QUI CONTIENT des templates
+        // (typiquement celui de la racine du projet, plus haut que l'exe).
+        for ancestor in exe.ancestors() {
+            let candidate = ancestor.join(".ftgen");
+            if ftgen_has_templates(&candidate) {
+                return candidate;
+            }
+        }
+        // 2e passage : à défaut, le premier .ftgen existant (même vide),
+        // pour disposer d'un emplacement d'écriture cohérent.
         for ancestor in exe.ancestors() {
             let candidate = ancestor.join(".ftgen");
             if candidate.is_dir() {
@@ -508,6 +531,37 @@ pub async fn get_templates(app: tauri::AppHandle) -> Result<Vec<TemplateInfo>, S
         }
     }
     Ok(templates)
+}
+
+#[derive(serde::Serialize)]
+pub struct FtgenInfo {
+    pub path: String,
+    pub template_count: usize,
+}
+
+/// Renvoie le dossier .ftgen effectivement résolu et le nombre de templates
+/// valides qu'il contient. Permet à l'interface de prévenir l'utilisateur
+/// quand aucun template n'est trouvé (au lieu de tourner dans le vide).
+#[tauri::command]
+pub async fn get_ftgen_info(app: tauri::AppHandle) -> Result<FtgenInfo, String> {
+    let dir = get_ftgen_dir(&app);
+    let templates_dir = dir.join("templates");
+    let mut count = 0usize;
+    if let Ok(entries) = fs::read_dir(&templates_dir) {
+        for e in entries.flatten() {
+            let p = e.path();
+            if p.extension().and_then(|s| s.to_str()) == Some("tex") {
+                let stem = p.file_stem().unwrap_or_default().to_string_lossy().to_string();
+                if templates_dir.join(format!("{}.meta.json", stem)).exists() {
+                    count += 1;
+                }
+            }
+        }
+    }
+    Ok(FtgenInfo {
+        path: dir.to_string_lossy().to_string(),
+        template_count: count,
+    })
 }
 
 #[tauri::command]

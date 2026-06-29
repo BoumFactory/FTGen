@@ -8,6 +8,7 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             commands::get_templates,
+            commands::get_ftgen_info,
             commands::load_template_meta,
             commands::save_project,
             commands::load_project,

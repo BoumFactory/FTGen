@@ -35,6 +35,7 @@ export function HomePage({ onNewProject, onOpenProject }: HomePageProps) {
   const [filterMode, setFilterMode] = useState<FilterMode>("all");
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [defaultTemplateId, setDefaultTemplateId] = useState<string>("template_academique");
+  const [ftgenInfo, setFtgenInfo] = useState<{ path: string; template_count: number } | null>(null);
 
   useEffect(() => { loadData(); }, []);
 
@@ -46,11 +47,13 @@ export function HomePage({ onNewProject, onOpenProject }: HomePageProps) {
 
   async function loadData() {
     try {
-      const [tpls, prjs] = await Promise.all([
+      const [tpls, prjs, info] = await Promise.all([
         invoke<TemplateInfo[]>("get_templates"),
         invoke<ProjectEntry[]>("list_projects"),
+        invoke<{ path: string; template_count: number }>("get_ftgen_info").catch(() => null),
       ]);
       setTemplates(tpls);
+      setFtgenInfo(info);
       setProjects(prjs.sort((a, b) => (b.updated_at || "").localeCompare(a.updated_at || "")));
     } catch (err) {
       console.error("Erreur chargement:", err);
@@ -243,6 +246,34 @@ export function HomePage({ onNewProject, onOpenProject }: HomePageProps) {
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="animate-spin w-8 h-8 border-2 border-or-500 border-t-transparent rounded-full" />
+          </div>
+        ) : templates.length === 0 ? (
+          <div className="max-w-2xl mx-auto mt-8">
+            <div className="rounded-xl border-2 border-or-500/60 bg-marine-700 p-6 shadow-lg">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">⚠️</span>
+                <h2 className="text-lg font-bold text-or-300">Aucun template dans le dossier <code>.ftgen</code></h2>
+              </div>
+              <p className="text-sm text-creme-300 mb-3">
+                L'application n'a trouvé aucun template. Elle cherche un dossier <code>.ftgen</code> contenant
+                des modèles, à partir de son propre emplacement.
+              </p>
+              {ftgenInfo && (
+                <p className="text-xs text-muted mb-4">
+                  Dossier cherché : <code className="text-creme-300 break-all">{ftgenInfo.path}</code>
+                </p>
+              )}
+              <div className="rounded-lg bg-marine-800/70 border border-marine-400/20 p-4">
+                <p className="text-sm font-semibold text-creme-200 mb-2">Pour la faire fonctionner :</p>
+                <ul className="text-sm text-creme-300 space-y-1.5 list-disc list-inside">
+                  <li>placer l'application <strong>dans le même dossier</strong> que <code>.ftgen</code>,</li>
+                  <li>ou copier le dossier <code>.ftgen</code> <strong>à côté de l'application</strong>.</li>
+                </ul>
+                <p className="text-xs text-muted mt-3">
+                  Puis relancer l'application (ou recharger avec <kbd>Ctrl</kbd>+<kbd>R</kbd>).
+                </p>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="max-w-6xl mx-auto">
