@@ -262,8 +262,23 @@ fn get_ftgen_dir(app: &tauri::AppHandle) -> PathBuf {
             }
         }
     }
-    // Résoudre la racine du projet
-    // En dev, Tauri lance cargo depuis src-tauri/ → remonter d'un cran
+    // Chercher un dossier .ftgen en remontant depuis l'EXÉCUTABLE.
+    // Indispensable sur macOS : une .app double-cliquée a pour répertoire
+    // courant "/", donc on ne peut pas se fier à current_dir(). En remontant
+    // depuis l'exe, on couvre :
+    //   - Windows : .ftgen à côté de ftgen.exe
+    //   - macOS   : .ftgen à côté de FTGen.app (exe = .../FTGen.app/Contents/MacOS/FTGen)
+    //   - dev     : .ftgen à la racine du projet (au-dessus de src-tauri/target/…)
+    if let Ok(exe) = std::env::current_exe() {
+        for ancestor in exe.ancestors() {
+            let candidate = ancestor.join(".ftgen");
+            if candidate.is_dir() {
+                return candidate;
+            }
+        }
+    }
+
+    // Repli : répertoire courant (comportement historique).
     let cwd = std::env::current_dir().unwrap_or_default();
     let project_root = if cwd.ends_with("src-tauri") {
         cwd.parent().unwrap_or(&cwd).to_path_buf()
