@@ -54,6 +54,13 @@ jobs:
             mv tectonic "src-tauri/binaries/tectonic-${ARCH}-apple-darwin"
             rm tectonic.tar.gz
           done
+          # Cible universelle : Tauri attend UN binaire 'tectonic-universal-apple-darwin'
+          # (et non les deux par-arch). On fusionne les deux arches avec lipo.
+          lipo -create \
+            src-tauri/binaries/tectonic-x86_64-apple-darwin \
+            src-tauri/binaries/tectonic-aarch64-apple-darwin \
+            -output src-tauri/binaries/tectonic-universal-apple-darwin
+          chmod +x src-tauri/binaries/tectonic-universal-apple-darwin
           ls -la src-tauri/binaries
 
       - name: Build Tauri (binaire universel)
