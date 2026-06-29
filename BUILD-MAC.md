@@ -43,13 +43,24 @@ L'app n'est pas signée (pas de compte Apple Developer). Au 1er lancement, macOS
 - **Clic droit** sur FTGen.app → **Ouvrir** → confirmer (à faire une seule fois),
 - ou en Terminal : `xattr -cr /chemin/vers/FTGen.app`
 
-## ⚠️ Point à régler avant diffusion réelle sur Mac
+## Dossier `.ftgen` à fournir à côté de l'app (RÉGLÉ)
 
-L'app cherche son dossier `.ftgen` dans le **répertoire courant**. Sous Windows (double-clic) ça marche, mais une **.app macOS double-cliquée a pour répertoire courant `/`** → `.ftgen` ne sera pas trouvé tel quel.
+L'app a besoin de son dossier `.ftgen` (templates, snippets, logos…). Il n'est **pas** dans le dépôt et **pas** dans l'app : il faut le **fournir à côté du `.app`**.
 
-Deux options :
-1. **Contournement immédiat** : au 1er lancement, ouvrir les **Réglages** de FTGen et définir le chemin absolu du dossier `.ftgen` (ce chemin est mémorisé).
-2. **Correctif propre (recommandé)** : adapter `get_ftgen_dir` (Rust) pour résoudre `.ftgen` relativement au bundle/à l'exécutable sur macOS, et/ou embarquer `.ftgen` comme ressource Tauri copiée au 1er lancement. Je peux faire ce correctif sur demande.
+Le code résout désormais `.ftgen` **à partir de l'emplacement de l'exécutable** (correctif `get_ftgen_dir`), donc il suffit que le collègue garde cette disposition :
+
+```
+FTGen/                  ← un dossier au choix
+├── FTGen.app           ← l'application (depuis le .dmg)
+└── .ftgen/             ← fourni séparément (caché dans le Finder car nom en point)
+    ├── templates/
+    ├── snippets/
+    └── …
+```
+
+Double-clic sur `FTGen.app` → l'app trouve `.ftgen` toute seule. **Important** : garder `FTGen.app` et `.ftgen` dans le **même dossier** (comme la version portable Windows). Si on déplace seulement l'app, elle ne trouvera plus `.ftgen`.
+
+Astuce Finder : le dossier `.ftgen` est masqué (nom commençant par un point). Pour le voir : `Cmd+Maj+.` dans le Finder.
 
 ## Notes techniques
 
